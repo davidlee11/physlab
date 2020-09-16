@@ -346,8 +346,8 @@ class wave_properties():
     def animate(self,i):
         x=np.linspace(0,10,int(51*self.k))
         y=np.sin(self.k*x-self.w*self.time+self.phi)
-        cx=np.cos(self.w*self.time+self.phi)-2.5
-        cy=np.sin(self.w*self.time+self.phi)
+        cx=np.cos(-self.w*self.time+self.phi)-2.5
+        cy=np.sin(-self.w*self.time+self.phi)
 
         self.line.set_data(x,y)
         self.point.set_data(x[0],y[0])
@@ -355,8 +355,8 @@ class wave_properties():
         self.cpoint.set_data(cx,cy)
         self.cpline.set_data([-2.5,cx],[0,cy])
         self.projline.set_data([cx,cx],[0,cy])
-        self.ltheta.set_data(0.25*np.cos(np.arange(0,self.w*self.time,0.1)+self.phi)-2.5,
-                             0.25*np.sin(np.arange(0,self.w*self.time,0.1)+self.phi))
+        self.ltheta.set_data(0.25*np.cos(-np.arange(0,self.w*self.time,0.1)+self.phi)-2.5,
+                             0.25*np.sin(-np.arange(0,self.w*self.time,0.1)+self.phi))
         self.ttheta.set_text(r'$\theta : {:.4g}\degree$'.format(((self.w*self.time+self.phi)*180/np.pi)%360))
         self.linebtw.set_data([cx,x[0]],[cy,y[0]])
 
