@@ -295,7 +295,7 @@ class ballistic_pendulum():
 class wave_properties():
     
     def __init__(self, k, w, phi=0, dt=0.1):
-        self.k, self.w, self.phi = k, w, phi
+        self.k, self.w, self.phi = k, w, phi*np.pi/180
 
         self.dt=dt
         self.time=0
@@ -322,13 +322,13 @@ class wave_properties():
                                    np.sin(np.linspace(0,2*np.pi,51)),':',color='k')
         
         self.ltheta, = self.ax.plot([],[],color='b')
-        self.ttheta = self.ax.text(-2.5,1.1,r'$\theta : {:.4g}\degree$'.format(0),
+        self.ttheta = self.ax.text(-2.5,1.1,r'$\theta : {:.4g}\degree$'.format(self.phi*180/np.pi),
                                    fontsize=12)
         self.linebtw, = self.ax.plot([],[],color='b')
         
         self.ax.axhline(0,lw=1,color='k')
         self.ax.axvline(0,lw=1,color='k')
-        self.ax.vlines(-2.5,ymin=0,ymax=1,lw=1,color='k')
+        self.ax.plot([-2.5,np.cos(np.pi/2+self.phi)-2.5],[0,np.sin(np.pi/2+self.phi)],lw=1,color='k')
         self.text = self.ax.text(0.01,1.01,r'$time : {:.2f}s'.format(self.time),
                                  fontsize=12,transform=self.ax.transAxes)
 
@@ -340,9 +340,9 @@ class wave_properties():
 
     def animate(self,i):
         x=np.linspace(0,10,51)
-        y=np.cos(self.k*x-self.w*self.time)
-        cx=np.cos(self.w*self.time+np.pi/2)-2.5
-        cy=np.sin(self.w*self.time+np.pi/2)
+        y=np.cos(self.k*x-self.w*self.time+self.phi)
+        cx=np.cos(self.w*self.time+np.pi/2+self.phi)-2.5
+        cy=np.sin(self.w*self.time+np.pi/2+self.phi)
 
         self.line.set_data(x,y)
         self.point.set_data(x[0],y[0])
@@ -350,9 +350,9 @@ class wave_properties():
         self.cpoint.set_data(cx,cy)
         self.cpline.set_data([-2.5,cx],[0,cy])
         self.projline.set_data([cx,cx],[0,cy])
-        self.ltheta.set_data(0.25*np.cos(np.arange(0,self.w*self.time,0.1)+np.pi/2)-2.5,
-                             0.25*np.sin(np.arange(0,self.w*self.time,0.1)+np.pi/2))
-        self.ttheta.set_text(r'$\theta : {:.4g}\degree$'.format(self.w*self.time*180/np.pi))
+        self.ltheta.set_data(0.25*np.cos(np.arange(0,self.w*self.time,0.1)+np.pi/2+self.phi)-2.5,
+                             0.25*np.sin(np.arange(0,self.w*self.time,0.1)+np.pi/2+self.phi))
+        self.ttheta.set_text(r'$\theta : {:.4g}\degree$'.format(((self.w*self.time+self.phi)*180/np.pi)%360))
         self.linebtw.set_data([cx,x[0]],[cy,y[0]])
         self.ax.set_xlim(-5,10)
         self.ax.set_ylim(-2,2)
