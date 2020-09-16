@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation,rc
@@ -298,8 +292,84 @@ class ballistic_pendulum():
         return anim
 
 
-# In[ ]:
+class wave_properties():
+    
+    def __init__(self, k, w, phi=0, dt=0.1):
+        self.k, self.w, self.phi = k, w, phi
 
+        self.dt=dt
+        self.time=0
+        
+        self.tmax=2*np.pi/w
+        self.frames=int(self.tmax/self.dt)+1
+        self.interval=self.dt*1e3
+        
+        self.fig, self.ax = plt.subplots(figsize=(15,4))
+        plt.close()
+        
+        self.ax.set_xlabel(r'$x (m)$',fontsize=12)
+        self.ax.set_ylabel(r'$y (m)$',fontsize=12,rotation=0)
+        self.ax.yaxis.set_label_coords(-0.12,0.5)
 
+        self.line, = self.ax.plot([],[],'o',color='k')
+        self.point, = self.ax.plot([],[],'o',color='r')
+        self.pline, = self.ax.plot([],[],color='r')
 
+        self.cpoint, = self.ax.plot([],[],'o',color='r')
+        self.cpline, = self.ax.plot([],[],color='k')
+        self.projline, = self.ax.plot([],[],color='r')
+        self.circle = self.ax.plot(np.cos(np.linspace(0,2*np.pi,51))-2.5,
+                                   np.sin(np.linspace(0,2*np.pi,51)),':',color='k')
+        
+        self.ltheta, = self.ax.plot([],[],color='b')
+        self.ttheta = self.ax.text(-2.5,1.1,r'$\theta : {:.4g}\degree$'.format(0),
+                                   fontsize=12)
+        self.linebtw, = self.ax.plot([],[],color='b')
+        
+        self.ax.axhline(0,lw=1,color='k')
+        self.ax.axvline(0,lw=1,color='k')
+        self.ax.vlines(-2.5,ymin=0,ymax=1,lw=1,color='k')
+        self.text = self.ax.text(0.01,1.01,r'$time : {:.2f}s'.format(self.time),
+                                 fontsize=12,transform=self.ax.transAxes)
 
+    def init_func(self):
+        self.line.set_data([],[])
+        self.point.set_data([],[])
+        self.pline.set_data([],[])
+        return (self.line, self.point, self.pline)
+
+    def animate(self,i):
+        x=np.linspace(0,10,51)
+        y=np.cos(self.k*x-self.w*self.time)
+        cx=np.cos(self.w*self.time+np.pi/2)-2.5
+        cy=np.sin(self.w*self.time+np.pi/2)
+
+        self.line.set_data(x,y)
+        self.point.set_data(x[0],y[0])
+        self.pline.set_data([x[0],x[0]],[0,y[0]])
+        self.cpoint.set_data(cx,cy)
+        self.cpline.set_data([-2.5,cx],[0,cy])
+        self.projline.set_data([cx,cx],[0,cy])
+        self.ltheta.set_data(0.25*np.cos(np.arange(0,self.w*self.time,0.1)+np.pi/2)-2.5,
+                             0.25*np.sin(np.arange(0,self.w*self.time,0.1)+np.pi/2))
+        self.ttheta.set_text(r'$\theta : {:.4g}\degree$'.format(self.w*self.time*180/np.pi))
+        self.linebtw.set_data([cx,x[0]],[cy,y[0]])
+        self.ax.set_xlim(-5,10)
+        self.ax.set_ylim(-2,2)
+        self.text.set_text(r'$time : {:.2f}s$'.format(self.time))
+        
+        self.time += self.dt
+
+        return (self.line, self.point, self.pline)
+    
+    def call(self):
+        anim=animation.FuncAnimation(self.fig,
+                                     self.animate,
+                                     init_func=self.init_func,
+                                     frames=self.frames,
+                                     interval=self.interval,
+                                     blit=True)
+        
+        rc('animation',html='jshtml')
+        
+        return anim
