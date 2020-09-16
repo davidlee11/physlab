@@ -360,7 +360,7 @@ class wave_properties():
         self.ttheta.set_text(r'$\theta : {:.4g}\degree$'.format(((self.w*self.time+self.phi)*180/np.pi)%360))
         self.linebtw.set_data([cx,x[0]],[cy,y[0]])
 
-        self.ax.imshow(np.array([y for f in range(2)]),cmap='gray',extent=[0,10,0,1])
+        self.ax.imshow(np.array([y for f in range(2)]),cmap='gray',extent=[0,10,-1.75,-1.25])
 
         self.ax.set_xlim(-5,10)
         self.ax.set_ylim(-2,2)
