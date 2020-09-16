@@ -344,7 +344,7 @@ class wave_properties():
         return (self.line, self.point, self.pline)
 
     def animate(self,i):
-        x=np.linspace(0,10,51)
+        x=np.linspace(0,10,int(51*self.k))
         y=np.sin(self.k*x-self.w*self.time+self.phi)
         cx=np.cos(self.w*self.time+self.phi)-2.5
         cy=np.sin(self.w*self.time+self.phi)
