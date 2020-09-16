@@ -300,7 +300,7 @@ class wave_properties():
         self.dt=dt
         self.time=0
         
-        self.tmax=2*np.pi/w
+        self.tmax=2*np.pi/self.w
         self.frames=int(self.tmax/self.dt)+1
         self.interval=self.dt*1e3
         
@@ -328,7 +328,12 @@ class wave_properties():
         
         self.ax.axhline(0,lw=1,color='k')
         self.ax.axvline(0,lw=1,color='k')
-        self.ax.plot([-2.5,np.cos(np.pi/2+self.phi)-2.5],[0,np.sin(np.pi/2+self.phi)],lw=1,color='k')
+        self.ax.text(np.pi/self.k,1.5,r'$\lambda : {:.4g}m$'.format(2*np.pi/self.k),fontsize=12,ha='center',va='bottom')
+        self.ax.text(0.01,0.95,r'$f : {:.4g}Hz$'.format(self.w/(2*np.pi))+'\n'+r'$T : {:.4g}s$'.format(self.tmax),
+                     fontsize=12,va='top',transform=self.ax.transAxes)
+        self.ax.annotate('',(2*np.pi/self.k,1.5),(0,1.5),arrowprops=dict(arrowstyle='<->'),color='g')
+        self.ax.plot([-2.5,np.cos(self.phi)-2.5],[0,np.sin(self.phi)],lw=1,color='k')
+
         self.text = self.ax.text(0.01,1.01,r'$time : {:.2f}s'.format(self.time),
                                  fontsize=12,transform=self.ax.transAxes)
 
@@ -340,9 +345,9 @@ class wave_properties():
 
     def animate(self,i):
         x=np.linspace(0,10,51)
-        y=np.cos(self.k*x-self.w*self.time+self.phi)
-        cx=np.cos(self.w*self.time+np.pi/2+self.phi)-2.5
-        cy=np.sin(self.w*self.time+np.pi/2+self.phi)
+        y=np.sin(self.k*x-self.w*self.time+self.phi)
+        cx=np.cos(self.w*self.time+self.phi)-2.5
+        cy=np.sin(self.w*self.time+self.phi)
 
         self.line.set_data(x,y)
         self.point.set_data(x[0],y[0])
@@ -350,10 +355,13 @@ class wave_properties():
         self.cpoint.set_data(cx,cy)
         self.cpline.set_data([-2.5,cx],[0,cy])
         self.projline.set_data([cx,cx],[0,cy])
-        self.ltheta.set_data(0.25*np.cos(np.arange(0,self.w*self.time,0.1)+np.pi/2+self.phi)-2.5,
-                             0.25*np.sin(np.arange(0,self.w*self.time,0.1)+np.pi/2+self.phi))
+        self.ltheta.set_data(0.25*np.cos(np.arange(0,self.w*self.time,0.1)+self.phi)-2.5,
+                             0.25*np.sin(np.arange(0,self.w*self.time,0.1)+self.phi))
         self.ttheta.set_text(r'$\theta : {:.4g}\degree$'.format(((self.w*self.time+self.phi)*180/np.pi)%360))
         self.linebtw.set_data([cx,x[0]],[cy,y[0]])
+
+        self.ax.imshow(np.array([y for f in range(2)]),cmap='gray',extent=[0,10,0,1])
+
         self.ax.set_xlim(-5,10)
         self.ax.set_ylim(-2,2)
         self.text.set_text(r'$time : {:.2f}s$'.format(self.time))
