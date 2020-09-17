@@ -448,3 +448,129 @@ class super_position():
         rc('animation',html='jshtml')
         
         return anim
+    
+    
+class wave_simulation():
+    
+    def __init__(self, amp, freq, L=10, tau=100, mu=1,N=50, b=0, bc='closed'):
+        self.amp, self.freq = amp, freq
+        self.L, self.N, self.b = L, N, b
+
+        self.bc=bc
+
+        self.x = np.linspace(0,L,N+1)
+        self.dx = self.x[1]-self.x[0]
+        self.y = np.zeros_like(self.x)
+        self.y1 = np.zeros_like(self.y)
+        self.y2 = np.zeros_like(self.y)
+
+        self.v = np.sqrt(tau/mu)
+        self.dt = self.dx/self.v
+        self.time = 0
+        
+        self.tmax = 20
+        self.frames = int(self.tmax/self.dt)+1
+        self.interval = self.dt*1e3
+        
+        self.fig, self.ax = plt.subplots(figsize=(12,4))
+        plt.close()
+        
+        self.ax.set_xlabel(r'$x (m)$',fontsize=12)
+        self.ax.set_ylabel(r'$y (m)$',fontsize=12,rotation=0)
+        self.ax.yaxis.set_label_coords(-0.12,0.5)
+
+        self.line, = self.ax.plot([],[],'o',color='k')
+        self.point, = self.ax.plot([],[],'o',color='r')
+        self.pline, = self.ax.plot([],[],color='r')
+
+        self.cpoint, = self.ax.plot([],[],'o',color='r')
+        self.cpline, = self.ax.plot([],[],lw=2,color='k')
+        self.circle = self.ax.plot(self.amp*np.cos(np.linspace(0,2*np.pi,51)),
+                                   self.amp*np.sin(np.linspace(0,2*np.pi,51))-1,lw=2,color='k')
+        
+        self.linebtw, = self.ax.plot([],[],lw=2,color='b')
+        
+        self.ax.axhline(0,lw=1,color='k')
+        self.ax.axvline(0,lw=1,color='k')
+        self.ax.text(1,1.5,r'$\lambda : {:.4g}m$'.format(self.v/self.freq),fontsize=12,ha='center',va='bottom')
+        self.ax.text(0.01,0.95,r'$f : {:.4g}Hz$'.format(self.freq)+'\n'+r'$v : {:.4g}m/s$'.format(self.v),
+                     fontsize=12,va='top',transform=self.ax.transAxes)
+        self.ax.annotate('',(self.v/self.freq,1.5),(0,1.5),arrowprops=dict(arrowstyle='<->'),color='g')
+
+        self.text = self.ax.text(0.01,1.01,r'$time : {:.2f}s'.format(self.time),
+                                 fontsize=12,transform=self.ax.transAxes)
+        
+    def init_step(self,y,y1,c,b,dt,V,f):
+        y[1:-1]=y1[1:-1]+0.5*c**2*(y1[2:]-2*y1[1:-1]+y1[:-2])+dt*V[1:-1]+0.5*dt**2*f[1:-1]
+        y[0]=f[0]
+        y[-1]=y1[-1]+c**2*(y1[-2]-y1[-1])+dt*V[-1]+0.5*dt**2*f[-1]
+        return y
+
+    def update(self,y,y1,y2,c,b,dt,V,f):
+        y[1:-1]=(2*y1[1:-1]+c**2*(y1[2:]-2*y1[1:-1]+y1[:-2])-(1-b*dt/2)*y2[1:-1]+dt**2*f[1:-1])/(1+b*dt/2)
+        y[0]=f[0]
+        y[-1]=(2*y1[-1]+2*c**2*(y1[-2]-y1[-1])-(1-b*dt/2)*y2[-1]+dt**2*f[-1])/(1+b*dt/2)
+        return y
+
+    def init_func(self):
+        self.line.set_data([],[])
+        self.point.set_data([],[])
+        self.pline.set_data([],[])
+        return (self.line, self.point, self.pline)
+
+    def animate(self,i):
+
+        c=self.v*self.dt/self.dx
+        w=2*np.pi*self.freq
+
+        V=np.zeros_like(self.y)
+
+        f=np.zeros_like(self.y)
+        f[0]=self.amp*np.sin(w*self.time)
+        #if (i-1)*self.dt>=2:
+        #  f[0]=0
+
+        self.y1=self.y.copy()
+        
+        if i==1:
+          self.y=self.init_step(self.y,self.y1,c,self.b,self.dt,V,f)
+          if self.bc=='closed':
+            self.y[-1]=0
+            
+        elif i>1:
+          self.y=self.update(self.y,self.y1,self.y2,c,self.b,self.dt,V,f)
+          if self.bc=='closed':
+            self.y[-1]=0
+
+        self.y2=self.y1.copy()
+
+        cx=self.amp*np.cos(w*self.time)
+        cy=self.amp*np.sin(w*self.time)-1
+
+        self.line.set_data(self.x,self.y)
+        self.point.set_data(self.x[0],self.y[0])
+        self.pline.set_data([self.x[0],self.x[0]],[0,self.y[0]])
+        self.cpoint.set_data(cx,cy)
+        self.cpline.set_data([0,cx],[-1,cy])
+ 
+        self.linebtw.set_data([cx,self.x[0]],[cy,self.y[0]])
+
+        self.ax.set_xlim(-2,10)
+        self.ax.set_ylim(-2,2)
+        self.text.set_text(r'$time : {:.2f}s$'.format(self.time))
+        
+        self.time += self.dt
+
+        return (self.line, self.point, self.pline)
+    
+    def call(self):
+        anim=animation.FuncAnimation(self.fig,
+                                     self.animate,
+                                     init_func=self.init_func,
+                                     frames=self.frames,
+                                     interval=self.interval,
+                                     blit=True)
+        
+        rc('animation',html='jshtml')
+        
+        return anim
