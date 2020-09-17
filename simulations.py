@@ -403,8 +403,8 @@ class super_position():
         self.ax.set_ylabel(r'$y (m)$',fontsize=12,rotation=0)
         self.ax.yaxis.set_label_coords(-0.12,0.5)
 
-        self.line0, = self.ax.plot([],[],':',color='b',label=r'$y1={:.2g}$sin$({:.2g}x-{:.2g}t)$'.format(self.a1,self.k1,self.w1))
-        self.line1, = self.ax.plot([],[],':',color='r',label=r'$y2={:.2g}$sin$({:.2g}x-{:.2g}t)$'.format(self.a2,self.k2,self.w2))
+        self.line0, = self.ax.plot([],[],':',color='b',label=r'$y_1={:.2g}$sin$({:.2g}x-{:.2g}t)$'.format(self.a1,self.k1,self.w1))
+        self.line1, = self.ax.plot([],[],':',color='r',label=r'$y_2={:.2g}$sin$({:.2g}x-{:.2g}t)$'.format(self.a2,self.k2,self.w2))
         self.line, = self.ax.plot([],[],'o',color='k',label=r'super position of $y_1$ and $y_2$')
         
         self.ax.axhline(0,lw=1,color='k')
