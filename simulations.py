@@ -381,3 +381,70 @@ class wave_properties():
         rc('animation',html='jshtml')
         
         return anim
+
+    
+    class super_position():
+    
+    def __init__(self, a1, k1, w1, a2, k2, w2, dt=0.1):
+        self.a1, self.k1, self.w1 = a1, k1, w1
+        self.a2, self.k2, self.w2 = a2, k2, w2
+
+        self.dt=dt
+        self.time=0
+        
+        self.tmax=20
+        self.frames=int(self.tmax/self.dt)+1
+        self.interval=self.dt*1e3
+        
+        self.fig, self.ax = plt.subplots(figsize=(10,6))
+        plt.close()
+        
+        self.ax.set_xlabel(r'$x (m)$',fontsize=12)
+        self.ax.set_ylabel(r'$y (m)$',fontsize=12,rotation=0)
+        self.ax.yaxis.set_label_coords(-0.12,0.5)
+
+        self.line0, = self.ax.plot([],[],':',color='b',label=r'$y1={:.2g}$sin$({:.2g}x-{:.2g}t)$'.format(self.a1,self.k1,self.w1))
+        self.line1, = self.ax.plot([],[],':',color='r',label=r'$y2={:.2g}$sin$({:.2g}x-{:.2g}t)$'.format(self.a2,self.k2,self.w2))
+        self.line, = self.ax.plot([],[],'o',color='k',label=r'super position of $y_1$ and $y_2$')
+        
+        self.ax.axhline(0,lw=1,color='k')
+
+        self.text = self.ax.text(0.01,1.01,r'$time : {:.2f}s'.format(self.time),
+                                 fontsize=12,transform=self.ax.transAxes)
+        self.ax.legend(loc='upper right')
+
+    def init_func(self):
+        self.line0.set_data([],[])
+        self.line1.set_data([],[])
+        self.line.set_data([],[])
+        return (self.line0, self.line1, self.line)
+
+    def animate(self,i):
+        x=np.linspace(0,10,int(51))
+        y0=self.a1*np.sin(self.k1*x-self.w1*self.time)
+        y1=self.a2*np.sin(self.k2*x+self.w2*self.time)
+        y=y0+y1
+
+        self.line0.set_data(x,y0)
+        self.line1.set_data(x,y1)
+        self.line.set_data(x,y)
+
+        self.ax.set_xlim(0,10)
+        self.ax.set_ylim(-3,3)
+        self.text.set_text(r'$time : {:.2f}s$'.format(self.time))
+        
+        self.time += self.dt
+
+        return (self.line0, self.line1, self.line)
+    
+    def call(self):
+        anim=animation.FuncAnimation(self.fig,
+                                     self.animate,
+                                     init_func=self.init_func,
+                                     frames=self.frames,
+                                     interval=self.interval,
+                                     blit=True)
+        
+        rc('animation',html='jshtml')
+        
+        return anim
