@@ -383,7 +383,7 @@ class wave_properties():
         return anim
 
     
-    class super_position():
+class super_position():
     
     def __init__(self, a1, k1, w1, a2, k2, w2, dt=0.1):
         self.a1, self.k1, self.w1 = a1, k1, w1
