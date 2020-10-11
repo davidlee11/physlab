@@ -8,7 +8,7 @@ class diffraction():
     def single(self):
         style={'description_width':'initial'}
         @interact(wave_length=IntSlider(value=600,min=400,max=700,step=1,description='파장 '+chr(0x03BB)+' (nm)',style=style),
-                  slit_width=FloatSlider(value=0.5,min=0.1,max=1,step=0.1,description='슬릿 넓이 w (mm)',style=style),
+                  slit_width=FloatSlider(value=0.5,min=0.1,max=1,step=0.1,description='슬릿 너비 w (mm)',style=style),
                   screen_distance=IntSlider(value=100,min=50,max=200,step=1,description='스크린 거리 L (cm)',style=style))
 
         def update(wave_length,slit_width,screen_distance):
@@ -27,7 +27,7 @@ class diffraction():
     def double(self):
         style={'description_width':'initial'}
         @interact(wave_length=IntSlider(value=600,min=400,max=700,step=1,description='파장 '+chr(0x03BB)+' (nm)',style=style),
-                  slit_width=FloatSlider(value=0.5,min=0.1,max=1,step=0.1,description='슬릿 넓이 w (mm)',style=style),
+                  slit_width=FloatSlider(value=0.5,min=0.1,max=1,step=0.1,description='슬릿 너비 w (mm)',style=style),
                   slit_distance=FloatSlider(value=3,min=1,max=5,step=0.1,description='슬릿 간격 d (mm)',style=style),
                   screen_distance=IntSlider(value=100,min=50,max=200,step=1,description='스크린 거리 L (cm)',style=style))
 
